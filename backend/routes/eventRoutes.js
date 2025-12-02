@@ -7,7 +7,7 @@ const {
   deleteEvent,
 } = require('../controllers/eventController');
 
-const { protect } = require('../middleware/authmiddleware');
+const { protect } = require('../middleware/authMiddleware');
 
 // ✅ Event CRUD Routes (protected)
 router.route('/')
