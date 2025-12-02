@@ -8,7 +8,7 @@ import {
 import Hero from "./pages/hero";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
-import CompleteSignup from "./pages/complete-Signup";   // ⭐ NEW IMPORT
+import CompleteSignup from "./pages/CompleteSignup.jsx";   // ⭐ NEW IMPORT
 import Events from "./Components/events";
 import SavedEvents from "./pages/SavedEvents";
 import { SavedEventsProvider } from "./pages/SavedEventsContext";
