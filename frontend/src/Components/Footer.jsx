@@ -1,4 +1,4 @@
-import { FaGithub, FaLinkedin, FaTwitter, FaInstagram } from "react-icons/fa";
+import { FaLinkedin, FaTwitter, FaInstagram } from "react-icons/fa";
 import { Link as RouterLink } from "react-router-dom";
 import { Link as ScrollLink } from "react-scroll";
 import { motion } from "framer-motion";
@@ -6,11 +6,10 @@ import { motion } from "framer-motion";
 const quickAccess = [
   { name: "Discover Events", type: "route", to: "/events" },
   { name: "Saved Events", type: "route", to: "/saved" },
-  { name: "TechPulse News", type: "scroll", to: "techpulse" },
+  { name: "TechPulse News", type: "route", to: "/techpulse" },
 ];
 
 const socialLinks = [
-  { icon: FaGithub, href: "#", bg: "hover:bg-indigo-500" },
   { icon: FaLinkedin, href: "#", bg: "hover:bg-blue-500" },
   { icon: FaTwitter, href: "#", bg: "hover:bg-sky-400" },
   { icon: FaInstagram, href: "#", bg: "hover:bg-pink-500" },
@@ -33,7 +32,7 @@ export default function Footer() {
       <div className="relative max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 md:grid-cols-3 gap-8">
         {/* Brand Section */}
         <div>
-          <h2 className="text-2xl font-bold text-white">EventHub</h2>
+          <h2 className="text-2xl font-bold text-white">Evenity</h2>
           <p className="mt-3 text-sm text-gray-400 leading-relaxed">
             Your one-stop platform for hackathons, workshops, and tech events. 🚀
           </p>
@@ -74,10 +73,10 @@ export default function Footer() {
           <p className="text-sm text-gray-400">
             📧 Email:{" "}
             <a
-              href="mailto:support@eventhub.com"
+              href="mailto:support@Evenity.com"
               className="hover:text-indigo-400"
             >
-              support@eventhub.com
+              support@Evenity.com
             </a>
           </p>
           <p className="mt-2 text-sm text-gray-400">
@@ -108,7 +107,7 @@ export default function Footer() {
       {/* Bottom Bar */}
       <div className="relative border-t border-gray-800 pt-6 pb-4 text-center text-sm text-gray-500">
         © {new Date().getFullYear()}{" "}
-        <span className="text-indigo-400 font-semibold">EventHub</span>. All
+        <span className="text-indigo-400 font-semibold">Evenity</span>. All
         rights reserved.
       </div>
     </motion.footer>

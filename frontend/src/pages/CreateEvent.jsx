@@ -1,6 +1,15 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Calendar, MapPin, Tag, Layers, FileText, Rocket, Image as ImageIcon } from "lucide-react";
+import {
+  Calendar,
+  MapPin,
+  Tag,
+  Layers,
+  FileText,
+  Rocket,
+  Image as ImageIcon,
+  Link2, // ✅ New icon
+} from "lucide-react";
 
 export default function CreateEvent() {
   const [formData, setFormData] = useState({
@@ -9,13 +18,13 @@ export default function CreateEvent() {
     location: "",
     category: "",
     tags: "",
+    link: "", // ✅ Added field
     description: "",
-    poster: null, // ✅ poster image
+    poster: null,
   });
 
   const [preview, setPreview] = useState(null);
 
-  // ✅ Updated categories with emojis
   const categories = [
     "🚀 Hackathon",
     "🌐 Web Development",
@@ -32,22 +41,25 @@ export default function CreateEvent() {
     setFormData({ ...formData, [name]: value });
   };
 
-  // ✅ Poster upload handler
   const handlePosterUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
       setFormData({ ...formData, poster: file });
-      setPreview(URL.createObjectURL(file)); // show preview
+      setPreview(URL.createObjectURL(file));
     }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // 1️⃣ Fetch existing events
     const storedEvents = JSON.parse(localStorage.getItem("events")) || [];
 
-    // 2️⃣ Convert poster to Base64 (so it can be stored in localStorage)
+    // Validate link (optional but nice UX)
+    if (formData.link && !formData.link.startsWith("http")) {
+      alert("⚠️ Please enter a valid URL (starting with http or https)");
+      return;
+    }
+
     let posterBase64 = null;
     if (formData.poster) {
       const reader = new FileReader();
@@ -66,7 +78,6 @@ export default function CreateEvent() {
       };
       reader.readAsDataURL(formData.poster);
     } else {
-      // If no poster, just save event
       const updatedEvents = [...storedEvents, formData];
       localStorage.setItem("events", JSON.stringify(updatedEvents));
 
@@ -82,6 +93,7 @@ export default function CreateEvent() {
       location: "",
       category: "",
       tags: "",
+      link: "",
       description: "",
       poster: null,
     });
@@ -103,7 +115,7 @@ export default function CreateEvent() {
           </h1>
           <p className="text-gray-200 mt-4 text-lg max-w-md mx-auto">
             Share your hackathon, workshop, or tech conference with the world.  
-            Make it memorable with <span className="text-yellow-300">EventLens</span>.
+            Make it memorable with <span className="text-yellow-300">Evenity</span>.
           </p>
         </motion.div>
         <div className="absolute inset-0 bg-[radial-gradient(rgba(255,255,255,0.1)_1px,transparent_1px)] bg-[size:24px_24px]" />
@@ -125,7 +137,7 @@ export default function CreateEvent() {
             </h1>
             <p className="text-gray-400 mt-2 text-sm">
               Fill out the details to add your event to{" "}
-              <span className="text-blue-300">EventLens 🚀</span>
+              <span className="text-blue-300">Evenity</span>
             </p>
           </div>
 
@@ -212,7 +224,22 @@ export default function CreateEvent() {
               />
             </div>
 
-            {/* ✅ Poster Upload */}
+            {/* ✅ Event Link */}
+            <div>
+              <label className="block mb-2 font-semibold flex items-center gap-2">
+                <Link2 className="w-4 h-4 text-cyan-400" /> Event Link
+              </label>
+              <input
+                type="url"
+                name="link"
+                value={formData.link}
+                onChange={handleChange}
+                placeholder="https://devfolio.co/events/myhackathon"
+                className="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 focus:ring-2 focus:ring-cyan-500 focus:outline-none"
+              />
+            </div>
+
+            {/* Poster Upload */}
             <div>
               <label className="block mb-2 font-semibold flex items-center gap-2">
                 <ImageIcon className="w-4 h-4 text-pink-400" /> Event Poster
@@ -266,4 +293,3 @@ export default function CreateEvent() {
     </div>
   );
 }
-

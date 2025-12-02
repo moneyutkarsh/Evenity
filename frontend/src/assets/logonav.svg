@@ -1,0 +1,34 @@
+<svg width="45" height="40" viewBox="0 0 45 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="nav-g" x1="10" y1="20" x2="35" y2="20" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#34D3F9"/>
+      <stop offset="0.5" stop-color="#7E72F9"/>
+      <stop offset="1" stop-color="#E93CF4"/>
+    </linearGradient>
+
+    <filter id="nav-f" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="1.5" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <g filter="url(#nav-f)">
+    
+    <g stroke="url(#nav-g)" stroke-width="1.5" fill="none">
+      <circle cx="15.5" cy="20" r="8"/> <circle cx="28.5" cy="20" r="8"/> </g>
+
+    <g stroke="url(#nav-g)" stroke-width="1.5" fill="none">
+        <path d="M15.5 12V6M15.5 28V34M7 20H1" stroke-linecap="round"/>
+        <path d="M28.5 12V6M28.5 28V34M37 20H43" stroke-linecap="round"/>
+    </g>
+    
+    <g fill="url(#nav-g)">
+      <circle cx="15.5" cy="6" r="1.25"/>
+      <circle cx="15.5" cy="34" r="1.25"/>
+      <circle cx="1" cy="20" r="1.25"/>
+      <circle cx="28.5" cy="6" r="1.25"/>
+      <circle cx="28.5" cy="34" r="1.25"/>
+      <circle cx="43" cy="20" r="1.25"/>
+    </g>
+  </g>
+</svg>

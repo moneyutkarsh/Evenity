@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const userSchema = mongoose.Schema(
+const userSchema = new mongoose.Schema(
   {
     name: {
       type: String,
@@ -13,8 +13,32 @@ const userSchema = mongoose.Schema(
     },
     password: {
       type: String,
-      required: [true, 'Please add a password'],
+      // ⚠️ Not required for OAuth users
+      required: function () {
+        return !this.googleId && !this.githubId && !this.linkedinId && !this.appleId;
+      },        
     },
+    username: {
+      type: String,
+      unique: true,
+      sparse: true,
+    },
+    // ✅ OAuth Provider IDs
+    googleId: {
+      type: String,
+      unique: true,
+      sparse: true,
+    },
+    githubId: {
+      type: String,
+      unique: true,
+      sparse: true,
+    },
+    linkedinId: {
+      type: String,
+      unique: true,
+      sparse: true,
+    }
   },
   { timestamps: true }
 );

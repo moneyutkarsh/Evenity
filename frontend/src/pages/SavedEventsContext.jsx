@@ -1,28 +1,36 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
+import { useAuth } from "../context/AuthContext"; // ✅ import your auth context
 
-const STORE_KEY = "savedEvents";
-
-// Create context
 const SavedEventsContext = createContext(null);
 
-// Context Provider
 export function SavedEventsProvider({ children }) {
-  // Load from localStorage
-  const [saved, setSaved] = useState(() => {
-    try {
-      const raw = localStorage.getItem(STORE_KEY);
-      return raw ? JSON.parse(raw) : [];
-    } catch {
-      return [];
-    }
-  });
+  const { user } = useAuth(); // ✅ get currently logged-in user
+  const [saved, setSaved] = useState([]);
 
-  // Persist whenever it changes
+  // 🧠 Helper: generate a unique storage key per user
+  const getUserKey = () => {
+    if (user && user.email) return `savedEvents_${user.email}`;
+    return "savedEvents_guest"; // fallback for guests
+  };
+
+  // 🔁 Load saved events whenever user changes (login/logout)
   useEffect(() => {
     try {
-      localStorage.setItem(STORE_KEY, JSON.stringify(saved));
+      const key = getUserKey();
+      const raw = localStorage.getItem(key);
+      setSaved(raw ? JSON.parse(raw) : []);
+    } catch {
+      setSaved([]);
+    }
+  }, [user]); // reload on user change
+
+  // 💾 Persist changes to correct user-specific localStorage
+  useEffect(() => {
+    try {
+      const key = getUserKey();
+      localStorage.setItem(key, JSON.stringify(saved));
     } catch {}
-  }, [saved]);
+  }, [saved, user]);
 
   return (
     <SavedEventsContext.Provider value={{ saved, setSaved }}>
@@ -35,4 +43,3 @@ export function SavedEventsProvider({ children }) {
 export function useSavedEvents() {
   return useContext(SavedEventsContext);
 }
-

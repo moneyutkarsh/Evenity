@@ -1,12 +1,9 @@
 import { useState, useEffect, useRef } from "react";
 import EventCard from "./EventsCard";
-import Navbar from "./NavBar";
 import Footer from "./Footer";
 import { motion } from "framer-motion";
-import AiRecommendation from "./AiRecommedation";
-import AiChatbot from "./AiChatBot";
 import Gallery from "./Gallery";
-import { Calendar } from "lucide-react"; // for calendar icons
+import { Calendar, Sparkles } from "lucide-react";
 
 const defaultEvents = [
   // 🚀 Hackathons
@@ -14,8 +11,10 @@ const defaultEvents = [
     title: "Codeforces Hackathon",
     description: "Competitive programming challenges.",
     link: "https://codeforces.com",
-    logo: "https://sta.codeforces.com/s/69307/images/codeforces-sponsored-by-ton.png",
-    date: "Sep 15, 2025",
+    registerLink: "https://codeforces.com/register",
+    ticketLink: null,
+    logo: "/logos/codeforces.png",
+    date: "Ongoing",
     category: "🚀 Hackathon",
     tags: ["hackathon", "coding", "competitive"],
     live: true,
@@ -26,43 +25,73 @@ const defaultEvents = [
     title: "LeetCode Contest",
     description: "Weekly coding contests and problems.",
     link: "https://leetcode.com/contest/",
+    registerLink: "https://leetcode.com/register",
+    ticketLink: null,
     logo: "https://upload.wikimedia.org/wikipedia/commons/1/19/LeetCode_logo_black.png",
-    date: "Sep 20, 2025",
+    date: "Weekly",
     category: "🚀 Hackathon",
     tags: ["leetcode", "dsa", "coding"],
     prizePool: "$2000",
     participants: 1500,
   },
   {
-    title: "Hashnode Hackathon",
-    description: "Build and blog your project to win rewards.",
-    link: "https://hashnode.com/hackathons",
-    logo: "https://cdn.hashnode.com/res/hashnode/image/upload/v1611902473383/U9tTjXnEv.png",
-    date: "Oct 2025",
+    title: "GitHub Universe Hackathon 2026",
+    description: "Build open-source tools and collaborate with developers worldwide.",
+    link: "https://githubuniverse.com/",
+    registerLink: "https://githubuniverse.com/register",
+    logo: "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png",
+    date: "Dec 2026",
     category: "🚀 Hackathon",
-    tags: ["hackathon", "dev", "blogging"],
-    prizePool: "$3000",
-    participants: 800,
+    tags: ["github", "open-source", "hackathon"],
+    prizePool: "$20,000",
+    participants: 6000,
+  },
+  {
+    title: "ETHGlobal Hackathon",
+    description: "Build and innovate in Web3 and blockchain development.",
+    link: "https://ethglobal.com/",
+    registerLink: "https://ethglobal.com/events",
+    ticketLink: null,
+    logo: "/logos/ethglobal.png",
+    date: "Multiple 2026",
+    category: "🚀 Hackathon",
+    tags: ["blockchain", "web3", "ethereum"],
+    prizePool: "$50,000",
+    participants: 5000,
   },
 
   // 🌐 Web Development
   {
-    title: "React Summit",
-    description: "Largest React conference in the world.",
-    link: "https://reactsummit.com/",
-    logo: "https://reactsummit.com/img/logo.svg",
-    date: "Oct 2025",
+    title: "React India",
+    description: "The biggest international React conference in India.",
+    link: "https://www.reactindia.io/",
+    registerLink: "https://www.reactindia.io/tickets",
+    logo: "/logos/react.png",
+    date: "Oct 2026",
     category: "🌐 Web Development",
-    tags: ["react", "frontend", "javascript"],
+    tags: ["react", "frontend", "india", "goa"],
     prizePool: "N/A",
-    participants: 5000,
+    participants: 2500,
+  },
+  {
+    title: "GopherCon India",
+    description: "The premier conference for the Go programming language in India.",
+    link: "https://www.gophercon.in/",
+    registerLink: "https://www.gophercon.in/tickets",
+    logo: "/logos/Gophercon.png",
+    date: "Feb 2026",
+    category: "🌐 Web Development",
+    tags: ["golang", "backend", "india", "pune"],
+    prizePool: "N/A",
+    participants: 800,
   },
   {
     title: "JSNation",
     description: "JavaScript conference for web developers.",
     link: "https://jsnation.com/",
+    registerLink: "https://jsnation.com/register",
     logo: "https://jsnation.com/img/logo.svg",
-    date: "Sep 2025",
+    date: "Jun 2026",
     category: "🌐 Web Development",
     tags: ["javascript", "node", "frontend"],
     prizePool: "N/A",
@@ -72,12 +101,25 @@ const defaultEvents = [
     title: "Next.js Conf",
     description: "Conference by Vercel about Next.js & React.",
     link: "https://nextjs.org/conf",
-    logo: "https://nextjs.org/static/twitter-cards/home.jpg",
-    date: "Oct 2025",
+    registerLink: "https://nextjs.org/register",
+    logo: "/logos/nextjs.png",
+    date: "Oct 2026",
     category: "🌐 Web Development",
     tags: ["nextjs", "vercel", "react"],
     prizePool: "N/A",
     participants: 4000,
+  },
+  {
+    title: "Google I/O 2026",
+    description: "Google's annual developer conference showcasing latest innovations.",
+    link: "https://io.google/",
+    registerLink: "https://io.google/register",
+    logo: "/logos/googleio.png",
+    date: "May 2026",
+    category: "🌐 Web Development",
+    tags: ["google", "android", "ai", "webdev"],
+    prizePool: "N/A",
+    participants: 100000,
   },
 
   // 🤖 AI/ML
@@ -85,6 +127,8 @@ const defaultEvents = [
     title: "Kaggle Competitions",
     description: "Machine Learning challenges & datasets.",
     link: "https://www.kaggle.com/competitions",
+    registerLink: "https://www.kaggle.com/register",
+    ticketLink: null,
     logo: "https://www.kaggle.com/static/images/site-logo.png",
     date: "Ongoing",
     category: "🤖 AI/ML",
@@ -96,7 +140,8 @@ const defaultEvents = [
     title: "NeurIPS",
     description: "Top AI/ML research conference.",
     link: "https://nips.cc/",
-    logo: "https://neurips.cc/Conferences/2025/Images/neurips_logo.png",
+    registerLink: "https://nips.cc/Register",
+    logo: "/logos/Neur.png",
     date: "Dec 2025",
     category: "🤖 AI/ML",
     tags: ["research", "ml", "ai"],
@@ -104,168 +149,247 @@ const defaultEvents = [
     participants: 8000,
   },
   {
-    title: "AI Expo Global",
-    description: "AI and big data industry expo.",
-    link: "https://www.ai-expo.net/",
-    logo: "https://www.ai-expo.net/wp-content/uploads/2019/07/ai-expo-logo.png",
-    date: "Nov 2025",
+    title: "ICML 2026",
+    description: "One of the top global conferences for machine learning research.",
+    link: "https://icml.cc/",
+    registerLink: "https://icml.cc/Conferences/2026/Register",
+    logo: "https://research.sony/images/ICML-logo-con.png",
+    date: "Jul 2026",
     category: "🤖 AI/ML",
-    tags: ["ai", "industry", "ml"],
+    tags: ["ml", "research", "ai"],
+    prizePool: "$70,000",
+    participants: 12000,
+  },
+  {
+    title: "TensorFlow Dev Summit",
+    description: "Official TensorFlow conference for ML developers.",
+    link: "https://www.tensorflow.org/dev-summit",
+    registerLink: "https://www.tensorflow.org/dev-summit/register",
+    logo: "/logos/tensorflow.png",
+    date: "Mar 2026",
+    category: "🤖 AI/ML",
+    tags: ["tensorflow", "deep learning", "ai"],
     prizePool: "N/A",
-    participants: 3000,
+    participants: 7000,
   },
 
   // ☁️ Cloud
   {
+    title: "AWS Community Day - Bengaluru",
+    description: "A community-led conference for AWS users.",
+    link: "https://aws.amazon.com/developer/community/community-days/",
+    registerLink: "https://awsugblr.in/communityday2026",
+    logo: "/logos/awsblr.png",
+    date: "Mar 2026",
+    category: "☁️ Cloud",
+    tags: ["aws", "cloud", "india", "bengaluru"],
+    prizePool: "N/A",
+    participants: 2000,
+  },
+  {
     title: "AWS re:Invent",
     description: "Amazon's biggest cloud computing conference.",
     link: "https://reinvent.awsevents.com/",
+    registerLink: "https://register.reinventglobal.com",
     logo: "https://a0.awsstatic.com/libra-css/images/logos/aws_logo_smile_1200x630.png",
-    date: "Nov 2025",
+    date: "Dec 2025",
     category: "☁️ Cloud",
     tags: ["aws", "cloud", "devops"],
     prizePool: "N/A",
-    participants: 6000,
+    participants: 60000,
   },
   {
     title: "Google Cloud Next",
     description: "Annual cloud event by Google.",
     link: "https://cloud.withgoogle.com/next",
+    registerLink: "https://cloud.withgoogle.com/next/register",
     logo: "https://cloud.google.com/images/social-icon-google-cloud-1200-630.png",
-    date: "Oct 2025",
+    date: "Apr 2026",
     category: "☁️ Cloud",
     tags: ["gcp", "cloud", "infrastructure"],
     prizePool: "N/A",
     participants: 4000,
   },
   {
-    title: "Microsoft Ignite",
-    description: "Microsoft’s cloud and enterprise conference.",
-    link: "https://ignite.microsoft.com/",
-    logo: "https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg",
-    date: "Nov 2025",
+    title: "DevOps India Summit",
+    description: "Leading DevOps conference.",
+    link: "https://www.devopsindiasummit.com/",
+    registerLink: "https://www.devopsindiasummit.com/register",
+    logo: "/logos/devopsindia.png",
+    date: "Aug 2026",
     category: "☁️ Cloud",
-    tags: ["azure", "cloud", "enterprise"],
+    tags: ["devops", "ci/cd", "cloud"],
     prizePool: "N/A",
-    participants: 4500,
+    participants: 5000,
   },
 
-  // 🛡️ Cybersecurity
+  // 🔒 Cybersecurity
   {
-    title: "DEF CON",
-    description: "One of the world’s largest hacker conventions.",
-    link: "https://defcon.org/",
-    logo: "https://defcon.org/images/defcon-30/defcon-30-logo.png",
-    date: "Aug 2025",
-    category: "🛡️ Cybersecurity",
-    tags: ["security", "hacking", "ctf"],
-    prizePool: "$10000",
-    participants: 5000,
+    title: "Nullcon Goa",
+    description: "India's premier and largest cybersecurity conference.",
+    link: "https://nullcon.net/",
+    registerLink: "https://nullcon.net/website/register.php",
+    logo: "/logos/nullcon.png",
+    date: "Mar 2026",
+    category: "🔒 Cybersecurity",
+    tags: ["security", "hacking", "infosec", "india", "goa"],
+    prizePool: "Varies",
+    participants: 2000,
+  },
+  {
+    title: "DEF CON 34",
+    description: "The world's largest hacker convention.",
+    link: "https://www.defcon.org/",
+    registerLink: "https://www.defcon.org/html/defcon-34/dc-34-index.html",
+    ticketLink: null, // Tickets are purchased in person at DEF CON
+    logo: "/logos/defcon.png",
+    date: "Aug 2026",
+    category: "🔒 Cybersecurity",
+    tags: ["security", "hacking", "infosec"],
+    prizePool: "N/A",
+    participants: 30000,
   },
   {
     title: "Black Hat USA",
-    description: "Cutting-edge security research conference.",
-    link: "https://blackhat.com/",
-    logo: "https://www.blackhat.com/images/logo-blackhat.svg",
-    date: "Jul 2025",
-    category: "🛡️ Cybersecurity",
-    tags: ["cybersecurity", "infosec", "research"],
-    prizePool: "$20000",
+    description: "Premier technical information security conference.",
+    link: "https://www.blackhat.com/",
+    registerLink: "https://www.blackhat.com/us-26/",
+    logo: "/logos/blackhat.png",
+    date: "Aug 2026",
+    category: "🔒 Cybersecurity",
+    tags: ["infosec", "cybersecurity", "corporate"],
+    prizePool: "N/A",
+    participants: 20000,
+  },
+  {
+    title: "OWASP Global AppSec Asia 2026",
+    description: "Leading application security event by OWASP.",
+    link: "https://owasp.org/",
+    registerLink: "https://owasp.org/events",
+    logo: "https://owasp.org/assets/images/logo.png",
+    date: "Nov 2026",
+    category: "🔒 Cybersecurity",
+    tags: ["security", "owasp", "appsec"],
+    prizePool: "N/A",
     participants: 4000,
   },
+
+  // 📢 CFP
   {
-    title: "OWASP Global AppSec",
-    description: "Application security conference by OWASP.",
-    link: "https://owasp.org/events/",
-    logo: "https://owasp.org/assets/images/logo.png",
-    date: "Sep 2025",
-    category: "🛡️ Cybersecurity",
-    tags: ["appsec", "owasp", "security"],
+    title: "CFP: The Web Conference 2026",
+    description: "Submit your research papers to the premier Web conference.",
+    link: "https://www2026.thewebconf.org/",
+    registerLink: "https://www2026.thewebconf.org/calls/papers/",
+    ticketLink: null,
+    logo: "/logos/Cfp.png",
+    date: "Dec 5, 2025",
+    category: "📢 CFP",
+    tags: ["cfp", "research", "webdev"],
     prizePool: "N/A",
-    participants: 3000,
+    participants: 0,
+  },
+  {
+    title: "CFP: ACM Web Science Conference 2026",
+    description: "Submit your research to the global Web Science community.",
+    link: "https://websci.org/",
+    registerLink: "https://websci.org/cfp",
+    ticketLink: null,
+    logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRNSXJT0Lcj8dLgeWemA8a9ceAu2FdlEHtojA&s",
+    date: "Jan 20, 2026",
+    category: "📢 CFP",
+    tags: ["cfp", "research", "web"],
+    prizePool: "N/A",
+    participants: 0,
+  },
+  {
+    title: "CFP: Open Source Summit",
+    description: "Open Source Summit submission portal.",
+    link: "https://events.linuxfoundation.org/open-source-summit-north-america/",
+    registerLink: "https://events.linuxfoundation.org/open-source-summit-north-america/program/cfp/",
+    ticketLink: null,
+    logo: "/logos/opensource.png",
+    date: "Jan 15, 2026",
+    category: "📢 CFP",
+    tags: ["cfp", "speaking", "opensource"],
+    prizePool: "N/A",
+    participants: 0,
+  },
+  {
+    title: "FOSSASIA Summit",
+    description: "Asia's leading open source technology event.",
+    link: "https://fossasia.org/",
+    registerLink: "https://eventyay.com/",
+    logo: "/logos/fossasia.png",
+    date: "Mar 2026",
+    category: "📢 CFP",
+    tags: ["opensource", "community", "foss"],
+    prizePool: "N/A",
+    participants: 4000,
   },
 
-  // 🎤 Speaker Platforms
+  // 🎤 Speaker Events
   {
-    title: "Sessionize",
-    description: "Apply as a tech speaker worldwide.",
-    link: "https://sessionize.com/",
-    logo: "https://sessionize.com/Content/img/logo.svg",
-    date: "Ongoing",
-    category: "🎤 Speaker",
-    tags: ["cfp", "speaker", "conference"],
-    prizePool: "N/A",
-    participants: 1000,
-  },
-  {
-    title: "Papercall",
-    description: "Platform for finding & submitting CFPs.",
-    link: "https://www.papercall.io/",
-    logo: "https://www.papercall.io/assets/images/papercall-logo.svg",
-    date: "Ongoing",
-    category: "🎤 Speaker",
-    tags: ["cfp", "speaking", "conference"],
-    prizePool: "N/A",
-    participants: 800,
-  },
-
-  // 📌 CFP Aggregators
-  {
-    title: "CFP Land",
-    description: "Weekly newsletter with open CFPs.",
-    link: "https://www.cfp.land/",
-    logo: "https://cfpland.com/images/logo.png",
-    date: "Weekly",
-    category: "📌 CFP",
-    tags: ["cfp", "newsletter"],
+    title: "TEDxBengaluru",
+    description: "A TED-like experience hosted in Bengaluru.",
+    link: "https://www.ted.com/tedx/events/54321",
+    registerLink: "https://www.ted.com/tedx/events/54321",
+    logo: "/logos/tedx.png",
+    date: "May 2026",
+    category: "🎤 Speaker Events",
+    tags: ["public speaking", "ideas", "india", "bengaluru"],
     prizePool: "N/A",
     participants: 500,
   },
   {
-    title: "Tech CFPs",
-    description: "Curated list of CFPs for tech conferences.",
-    link: "https://techcfp.com/",
-    logo: "https://techcfp.com/logo192.png",
-    date: "Ongoing",
-    category: "📌 CFP",
-    tags: ["cfp", "calls", "conferences"],
+    title: "DevRelCon",
+    description: "Conference for Developer Relations professionals.",
+    link: "https://devrelcon.com/",
+    registerLink: "https://london.devrel.net/",
+    logo: "/logos/devrelcon.png",
+    date: "Jun 2026",
+    category: "🎤 Speaker Events",
+    tags: ["devrel", "community", "speaking"],
     prizePool: "N/A",
-    participants: 700,
+    participants: 400,
   },
 
-  // 🌍 Networking
+  // 🤝 Networking
   {
-    title: "Meetup",
-    description: "Find local groups & speaker invites.",
-    link: "https://www.meetup.com/",
-    logo: "https://upload.wikimedia.org/wikipedia/commons/3/3b/Meetup_Logo.png",
-    date: "Ongoing",
-    category: "🌍 Networking",
-    tags: ["community", "networking"],
+    title: "Silicon Valley Tech Mixer 2026",
+    description: "A global networking meetup for founders, engineers & VCs.",
+    link: "https://www.eventbrite.com/e/sf-startup-tech-mixer-2026-tickets-1975643604203",
+    registerLink: "https://www.eventbrite.com/e/sf-startup-tech-mixer-2026-tickets-1975643604203",
+    ticketLink: null,
+    logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQTkWWUFSTKhNLXmpXZyie5jTOWsapzT52ajA&s",
+    date: "Feb 2026",
+    category: "🤝 Networking",
+    tags: ["networking", "founders", "global"],
     prizePool: "N/A",
-    participants: 3000,
+    participants: 500,
   },
   {
-    title: "Dev.to Meetups",
-    description: "Developer community meetups and networking.",
-    link: "https://dev.to/meetups",
-    logo: "https://d2fltix0v2e0sb.cloudfront.net/dev-black.png",
-    date: "Ongoing",
-    category: "🌍 Networking",
-    tags: ["dev", "community", "networking"],
+    title: "Startup Grind Global Conference",
+    description: "Connect with startups, investors, and innovators worldwide.",
+    link: "https://www.startupgrind.com/conference/",
+    registerLink: "https://www.startupgrind.com/conference/tickets/",
+    logo: "/logos/global.png",
+    date: "Apr 2026",
+    category: "🤝 Networking",
+    tags: ["startups", "vc", "networking"],
+    prizePool: "N/A",
+    participants: 10000,
+  },
+  {
+    title: "Women Who Code CONNECT India",
+    description: "Empowering women in tech.",
+    link: "https://www.womenwhocode.com/",
+    registerLink: "https://www.womenwhocode.com/events",
+    logo: "/logos/wwcode.png",
+    date: "Mar 2026",
+    category: "🤝 Networking",
+    tags: ["diversity", "tech", "women"],
     prizePool: "N/A",
     participants: 2000,
-  },
-  {
-    title: "Product Hunt Meetups",
-    description: "Events for makers & startup enthusiasts.",
-    link: "https://www.producthunt.com/",
-    logo: "https://ph-files.imgix.net/5ef2a9c7-df47-4633-8512-7f98efb725f8.png",
-    date: "Ongoing",
-    category: "🌍 Networking",
-    tags: ["startups", "makers", "networking"],
-    prizePool: "N/A",
-    participants: 1500,
   },
 ];
 
@@ -298,11 +422,27 @@ const Events = () => {
     return () => clearInterval(interval);
   }, []);
 
+  // Load custom events from localStorage
   useEffect(() => {
-    const savedEvents = JSON.parse(localStorage.getItem("events")) || [];
-    setEventsData([...defaultEvents, ...savedEvents]);
+    const loadEvents = () => {
+      const savedEvents = JSON.parse(localStorage.getItem("events")) || [];
+      setEventsData([...defaultEvents, ...savedEvents]);
+    };
+    
+    loadEvents();
+    
+    // Listen for storage events (when new events are added)
+    window.addEventListener("storage", loadEvents);
+    return () => window.removeEventListener("storage", loadEvents);
   }, []);
 
+  // Load bookmarked events
+  useEffect(() => {
+    const saved = JSON.parse(localStorage.getItem("bookmarkedEvents")) || [];
+    setBookmarkedEvents(saved);
+  }, []);
+
+  // Save bookmarked events
   useEffect(() => {
     localStorage.setItem("bookmarkedEvents", JSON.stringify(bookmarkedEvents));
   }, [bookmarkedEvents]);
@@ -322,10 +462,10 @@ const Events = () => {
     "🌐 Web Development",
     "🤖 AI/ML",
     "☁️ Cloud",
-    "🛡️ Cybersecurity",
-    "🎤 Speaker",
-    "📌 CFP",
-    "🌍 Networking",
+    "🔒 Cybersecurity",
+    "🎤 Speaker Events",
+    "📢 CFP",
+    "🤝 Networking",
   ];
 
   const filteredEvents = eventsData.filter((event) => {
@@ -336,16 +476,22 @@ const Events = () => {
 
     let matchesDate = true;
     if (startDate || endDate) {
-      const eventDate = new Date(event.date);
-      if (startDate && eventDate < new Date(startDate)) matchesDate = false;
-      if (endDate && eventDate > new Date(endDate)) matchesDate = false;
+      const eventDateStr = event.date;
+      // Handle various date formats
+      if (eventDateStr && !eventDateStr.toLowerCase().includes("ongoing") && !eventDateStr.toLowerCase().includes("weekly")) {
+        const eventDate = new Date(eventDateStr);
+        if (!isNaN(eventDate.getTime())) {
+          if (startDate && eventDate < new Date(startDate)) matchesDate = false;
+          if (endDate && eventDate > new Date(endDate)) matchesDate = false;
+        }
+      }
     }
 
     return matchesSearch && matchesCategory && matchesDate;
   });
 
   const upcomingEvents = filteredEvents.filter(
-    (event) => event.live || event.date.includes("2025")
+    (event) => event.live || (event.date && event.date.includes("2025"))
   );
 
   return (
@@ -353,29 +499,29 @@ const Events = () => {
       {/* Dark Blue Shady Background */}
       <div className="absolute inset-0 bg-gradient-to-b from-blue-950 via-blue-900 to-gray-900 z-0"></div>
 
-     {/* Twinkling Stars Background */}
-<div className="absolute inset-0 z-0">
-  {[...Array(80)].map((_, i) => (
-    <motion.span
-      key={i}
-      className="absolute w-[2px] h-[2px] bg-white rounded-full"
-      style={{
-        top: `${Math.random() * 100}%`,
-        left: `${Math.random() * 100}%`,
-        opacity: Math.random() * 0.7 + 0.2,
-      }}
-      animate={{
-        opacity: [0.2, 1, 0.2], // twinkle effect
-        scale: [1, 1.3, 1], // slight shimmer
-      }}
-      transition={{
-        duration: Math.random() * 4 + 3, // 3s–7s per twinkle
-        repeat: Infinity,
-        ease: "easeInOut",
-      }}
-    />
-  ))}
-</div>
+      {/* Twinkling Stars Background */}
+      <div className="absolute inset-0 z-0">
+        {[...Array(80)].map((_, i) => (
+          <motion.span
+            key={i}
+            className="absolute w-[2px] h-[2px] bg-white rounded-full"
+            style={{
+              top: `${Math.random() * 100}%`,
+              left: `${Math.random() * 100}%`,
+              opacity: Math.random() * 0.7 + 0.2,
+            }}
+            animate={{
+              opacity: [0.2, 1, 0.2],
+              scale: [1, 1.3, 1],
+            }}
+            transition={{
+              duration: Math.random() * 4 + 3,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+          />
+        ))}
+      </div>
 
       {/* Soft Overlay */}
       <div className="absolute inset-0 bg-black/30 z-0"></div>
@@ -386,15 +532,41 @@ const Events = () => {
         <br />
         <br />
 
-        <div className="p-10 text-center">
-          <h1 className="text-5xl font-extrabold mb-4">🚀 Explore Tech Events</h1>
-          <p className="text-gray-300 text-lg">
-            Hackathons, Web Dev, AI/ML, Cloud, Cybersecurity, CFPs & more
-          </p>
-        </div>
+        <motion.div
+  initial={{ opacity: 0, y: -20 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ duration: 0.8 }}
+  className="p-16 text-center relative z-10"
+>
+  {/* Title Capsule */}
+  <div className="inline-flex items-center justify-center gap-3 px-8 py-3 rounded-2xl 
+  bg-gradient-to-r from-blue-500/20 via-blue-400/20 to-blue-300/20
+  backdrop-blur-md border border-white/10 mb-6">
 
-        <AiRecommendation eventsData={eventsData} />
+  <span className="text-4xl animate-bounce">📈</span>
 
+  <h1 className="text-5xl md:text-6xl font-extrabold 
+    bg-gradient-to-r from-blue-400 via-blue-500 to-blue-600
+    bg-clip-text text-transparent">
+    Stay ahead. Stay updated. Stay winning.
+  </h1>
+</div>
+
+
+
+  {/* Subtitle */}
+  <p className="text-gray-300 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
+    Discover{" "}
+    <span className="text-purple-400 font-semibold">Hackathons</span>,{" "}
+    <span className="text-indigo-400 font-semibold">AI/ML Summits</span>,{" "}
+    <span className="text-pink-400 font-semibold">Cloud</span>,{" "}
+    <span className="text-cyan-400 font-semibold">Cybersecurity</span> and{" "}
+    <span className="text-amber-400 font-semibold">CFPs</span> — all in one place ✨
+  </p>
+</motion.div>
+
+        <Gallery/>
+        
         {/* Search + Filters */}
         <div className="flex flex-col md:flex-row justify-center gap-4 px-10 mt-8 flex-wrap md:flex-nowrap items-center">
           {/* Search Bar */}
@@ -463,21 +635,7 @@ const Events = () => {
           </motion.div>
         </div>
 
-        {/* Saved Events */}
-        {bookmarkedEvents.length > 0 && (
-          <div className="px-10 mt-12">
-            <h2 className="text-3xl font-bold mb-6 text-yellow-400">
-              ⭐ Saved Events
-            </h2>
-            <EventCard
-              eventsData={bookmarkedEvents}
-              toggleBookmark={toggleBookmark}
-              bookmarkedEvents={bookmarkedEvents}
-            />
-          </div>
-        )}
-
-        {/* Upcoming Events */}
+        {/* Upcoming & Live Events */}
         {upcomingEvents.length > 0 && (
           <div className="px-10 mt-12">
             <h2 className="text-3xl font-bold mb-6 text-purple-400">
@@ -491,32 +649,42 @@ const Events = () => {
           </div>
         )}
 
+        {/* 🌍 Weekly Global Events */}
+        <div className="px-10 mt-12">
+          <h2 className="text-3xl font-bold mb-6 text-green-400">
+            🌍 Weekly Global Events
+          </h2>
+          <EventCard
+            eventsData={filteredEvents.filter(
+              (event) =>
+                event.date.toLowerCase().includes("weekly") ||
+                event.date.toLowerCase().includes("ongoing")
+            )}
+            toggleBookmark={toggleBookmark}
+            bookmarkedEvents={bookmarkedEvents}
+          />
+        </div>
+
         {/* Categorized Sections */}
-        {categories.map((cat) => {
-          const catEvents = filteredEvents.filter(
-            (event) => event.category === cat
-          );
-          if (catEvents.length === 0) return null;
-
-          return (
-            <div key={cat} className="px-10 mt-12">
-              <h2 className="text-2xl font-semibold mb-6 border-b border-gray-700 pb-2">
-                {cat}
-              </h2>
-              <EventCard
-                eventsData={catEvents}
-                toggleBookmark={toggleBookmark}
-                bookmarkedEvents={bookmarkedEvents}
-              />
-            </div>
-          );
-        })}
-
-        <br />
-        <Gallery />
+        {categories.map(
+          (cat) =>
+            filteredEvents.some((e) => e.category === cat) && (
+              <div key={cat} className="px-10 mt-12">
+                <h2 className="text-3xl font-bold mb-6 text-blue-400">
+                  {cat}
+                </h2>
+                <EventCard
+                  eventsData={filteredEvents.filter(
+                    (event) => event.category === cat
+                  )}
+                  toggleBookmark={toggleBookmark}
+                  bookmarkedEvents={bookmarkedEvents}
+                />
+              </div>
+            )
+        )}
         <br />
         <Footer />
-        <AiChatbot eventsData={eventsData} />
       </div>
     </div>
   );
