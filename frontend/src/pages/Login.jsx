@@ -41,7 +41,7 @@ export default function Login() {
     e.preventDefault();
 
     try {
-      const res = await API.post("/users/login", formData);
+      const res = await API.post("/auth/login", formData);
 
       console.log("🔥 Login response:", res.data);
 

@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const passport = require("passport");
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
 const User = require("../model/userModel");
 
 /* -----------------------------------------------------
@@ -18,45 +19,123 @@ const generateToken = (user) =>
 const FRONTEND_URL = process.env.CLIENT_URL || "http://localhost:3000";
 
 /* =====================================================
-   ⭐ GOOGLE AUTH FLOW
+   ⭐ EMAIL + PASSWORD SIGNUP
+======================================================*/
+router.post("/signup", async (req, res) => {
+  try {
+    const { name, email, password } = req.body;
+
+    if (!name || !email || !password) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
+    // Check existing email
+    const userExists = await User.findOne({ email });
+    if (userExists) {
+      return res.status(400).json({ message: "Email already registered" });
+    }
+
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Create user
+    const newUser = await User.create({
+      name,
+      email,
+      password: hashedPassword,
+    });
+
+    const token = generateToken(newUser);
+
+    return res.json({
+      message: "Signup successful",
+      token,
+      user: {
+        id: newUser._id,
+        name: newUser.name,
+        email: newUser.email,
+      },
+    });
+  } catch (err) {
+    console.error("Signup Error:", err);
+    return res.status(500).json({ message: "Signup failed" });
+  }
+});
+
+/* =====================================================
+   ⭐ EMAIL + PASSWORD LOGIN
+======================================================*/
+router.post("/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    // Find user
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ message: "Invalid email or password" });
+    }
+
+    // Compare password
+    const isMatch = await bcrypt.compare(password, user.password || "");
+    if (!isMatch) {
+      return res.status(400).json({ message: "Invalid email or password" });
+    }
+
+    const token = generateToken(user);
+
+    return res.json({
+      message: "Login successful",
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+      },
+    });
+  } catch (err) {
+    console.error("Login Error:", err);
+    return res.status(500).json({ message: "Login failed" });
+  }
+});
+
+/* =====================================================
+   ⭐ GOOGLE AUTH
 ======================================================*/
 
-/* STEP 1 — Redirect to Google */
+// STEP 1 — Redirect to Google
 router.get(
   "/google",
   passport.authenticate("google", { scope: ["profile", "email"] })
 );
 
-/* STEP 2 — Google OAuth Callback (NO auto-creation) */
+// STEP 2 — Google OAuth Callback
 router.get(
   "/google/callback",
   passport.authenticate("google", { session: false }),
   async (req, res) => {
     try {
-      const googleUser = req.user; // from passport.js
+      const googleUser = req.user;
 
       if (!googleUser?.email) {
         console.error("Google profile missing email");
         return res.redirect(`${FRONTEND_URL}/login`);
       }
 
-      // Check if a user with this email already exists
+      // Check if user exists
       let existingUser = await User.findOne({ email: googleUser.email });
 
       if (existingUser) {
-        // If user exists but has no googleId yet, attach it
+        // Add googleId if missing
         if (!existingUser.googleId && googleUser.googleId) {
           existingUser.googleId = googleUser.googleId;
           await existingUser.save();
         }
 
         const token = generateToken(existingUser);
-        return res.redirect(
-          `${FRONTEND_URL}/auth/callback?token=${token}`
-        );
+        return res.redirect(`${FRONTEND_URL}/auth/callback?token=${token}`);
       }
 
-      // ⭐ NEW USER → send them to complete-signup with googleId also
+      // New user → send data to complete-signup page
       const redirectUrl = `${FRONTEND_URL}/complete-signup?email=${encodeURIComponent(
         googleUser.email
       )}&name=${encodeURIComponent(
@@ -71,7 +150,7 @@ router.get(
   }
 );
 
-/* STEP 3 — Google Complete Signup */
+// STEP 3 — Google Complete Signup
 router.post("/google/complete-signup", async (req, res) => {
   try {
     let { email, name, username, googleId } = req.body;
@@ -83,22 +162,20 @@ router.post("/google/complete-signup", async (req, res) => {
     }
 
     if (!username) {
-      return res
-        .status(400)
-        .json({ message: "Username is required" });
+      return res.status(400).json({ message: "Username is required" });
     }
 
     username = username.trim().toLowerCase();
 
-    // Email already existing?
+    // Email already used?
     const emailExists = await User.findOne({ email });
     if (emailExists) {
-      return res.status(400).json({
-        message: "Email already registered. Please login instead.",
-      });
+      return res
+        .status(400)
+        .json({ message: "Email already registered. Please login." });
     }
 
-    // Username uniqueness (only works if you add `username` field in schema)
+    // Unique username
     const usernameExists = await User.findOne({ username });
     if (usernameExists) {
       return res
@@ -106,12 +183,12 @@ router.post("/google/complete-signup", async (req, res) => {
         .json({ message: "Username already taken. Try another." });
     }
 
-    // Create user – NOTE: password is not required because googleId is set
+    // Create user
     const newUser = await User.create({
       name,
       email,
       googleId,
-      username, // safe even if not in schema (Mongoose will ignore)
+      username,
     });
 
     const token = generateToken(newUser);
@@ -153,10 +230,7 @@ router.get(
 /* =====================================================
    ⭐ LINKEDIN AUTH
 ======================================================*/
-router.get(
-  "/linkedin",
-  passport.authenticate("linkedin", { state: true })
-);
+router.get("/linkedin", passport.authenticate("linkedin", { state: true }));
 
 router.get(
   "/linkedin/callback",

@@ -1,16 +1,16 @@
 import axios from "axios";
 
-const API = axios.create({
-  baseURL: "http://localhost:5000/api",
-});
+// Always attach /api to the backend URL
+const base =
+  process.env.REACT_APP_API_URL
+    ? process.env.REACT_APP_API_URL + "/api"
+    : "http://localhost:5000/api";
 
-// Attach JWT token automatically if present
-API.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token");
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
+console.log("📡 Axios Base URL:", base);
+
+const API = axios.create({
+  baseURL: base,
+  withCredentials: true,
 });
 
 export default API;
